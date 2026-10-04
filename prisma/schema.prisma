@@ -1,0 +1,293 @@
+// Data model — see docs/TRD.md §5.
+// Credit balances are never stored as a mutable number: they are the SUM of credit_ledger rows.
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum Role {
+  USER
+  ADMIN
+}
+
+enum GownType {
+  BRIDAL
+  ENGAGEMENT
+  EVENING
+  BRIDESMAID
+}
+
+enum GownStyle {
+  PUFFY
+  MERMAID
+  SIMPLE
+  A_LINE
+}
+
+enum GownMode {
+  SALE
+  RENT
+  BOTH
+}
+
+enum GownStatus {
+  AVAILABLE
+  SOLD
+  RENTED
+  HIDDEN
+}
+
+enum LedgerType {
+  free_signup
+  referral_bonus
+  purchase
+  consume
+  refund
+  reversal
+  admin_adjust
+}
+
+enum CreditBucket {
+  free
+  paid
+}
+
+enum PaymentStatus {
+  PENDING
+  PAID
+  FAILED
+  REFUNDED
+}
+
+enum TryonStatus {
+  queued
+  running
+  done
+  failed
+}
+
+enum ReferralStatus {
+  registered
+  charged
+  rewarded
+  revoked
+  rejected
+}
+
+enum BookingStatus {
+  NEW
+  CONFIRMED
+  DONE
+  CANCELLED
+}
+
+model User {
+  id           String   @id @default(cuid())
+  phone        String   @unique
+  name         String?
+  role         Role     @default(USER)
+  referralCode String   @unique @map("referral_code")
+  referredById String?  @map("referred_by")
+  signupIp     String?  @map("signup_ip")
+  deviceId     String?  @map("device_id")
+  blocked      Boolean  @default(false)
+  createdAt    DateTime @default(now()) @map("created_at")
+
+  referredBy User?          @relation("UserReferrals", fields: [referredById], references: [id])
+  invitees   User[]         @relation("UserReferrals")
+  sessions   Session[]
+  ledger     CreditLedger[]
+  payments   Payment[]
+  tryons     TryonJob[]
+  invited    Referral[]     @relation("Inviter")
+  invitedBy  Referral?      @relation("Invitee")
+
+  @@index([deviceId])
+  @@index([signupIp])
+  @@map("users")
+}
+
+model Session {
+  id        String   @id @default(cuid())
+  tokenHash String   @unique @map("token_hash")
+  userId    String   @map("user_id")
+  expiresAt DateTime @map("expires_at")
+  createdAt DateTime @default(now()) @map("created_at")
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("sessions")
+}
+
+model OtpCode {
+  id         String    @id @default(cuid())
+  phone      String
+  codeHash   String    @map("code_hash")
+  expiresAt  DateTime  @map("expires_at")
+  attempts   Int       @default(0)
+  consumedAt DateTime? @map("consumed_at")
+  ip         String?
+  createdAt  DateTime  @default(now()) @map("created_at")
+
+  @@index([phone, createdAt])
+  @@map("otp_codes")
+}
+
+model Gown {
+  id          String     @id @default(cuid())
+  slug        String     @unique
+  name        String
+  tagline     String?
+  description String
+  fabric      String?
+  type        GownType
+  style       GownStyle
+  neckline    String?
+  sleeve      String?
+  color       String
+  mode        GownMode   @default(SALE)
+  status      GownStatus @default(AVAILABLE)
+  priceRange  String?    @map("price_range")
+  featured    Boolean    @default(false)
+  // Public image paths (real photos of the gown: front, back, details)
+  images      String[]
+  // Reference image(s) sent to the try-on model (storage keys or public paths)
+  tryonRefs   String[]   @map("tryon_refs")
+  sortOrder   Int        @default(0) @map("sort_order")
+  createdAt   DateTime   @default(now()) @map("created_at")
+  updatedAt   DateTime   @updatedAt @map("updated_at")
+
+  tryons   TryonJob[]
+  bookings Booking[]
+
+  @@index([type, style, color, mode, status])
+  @@map("gowns")
+}
+
+model CreditLedger {
+  id             String       @id @default(cuid())
+  userId         String       @map("user_id")
+  type           LedgerType
+  amount         Int
+  bucket         CreditBucket
+  refId          String?      @map("ref_id")
+  // Unique key per business event (e.g. "consume:job:<id>") — guarantees idempotency.
+  idempotencyKey String       @unique @map("idempotency_key")
+  note           String?
+  createdAt      DateTime     @default(now()) @map("created_at")
+  user           User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, bucket])
+  @@map("credit_ledger")
+}
+
+model CreditPackage {
+  id        String    @id @default(cuid())
+  title     String
+  credits   Int
+  priceIrr  Int       @map("price_irr")
+  active    Boolean   @default(true)
+  sortOrder Int       @default(0) @map("sort_order")
+  createdAt DateTime  @default(now()) @map("created_at")
+  payments  Payment[]
+
+  @@map("credit_packages")
+}
+
+model Payment {
+  id         String        @id @default(cuid())
+  userId     String        @map("user_id")
+  packageId  String        @map("package_id")
+  credits    Int
+  amountIrr  Int           @map("amount_irr")
+  gateway    String
+  authority  String?       @unique
+  refNumber  String?       @map("ref_number")
+  status     PaymentStatus @default(PENDING)
+  createdAt  DateTime      @default(now()) @map("created_at")
+  verifiedAt DateTime?     @map("verified_at")
+  user       User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  package    CreditPackage @relation(fields: [packageId], references: [id])
+
+  @@index([userId, status])
+  @@map("payments")
+}
+
+model TryonJob {
+  id             String        @id @default(cuid())
+  userId         String        @map("user_id")
+  gownId         String        @map("gown_id")
+  inputImageKey  String?       @map("input_image_key")
+  status         TryonStatus   @default(queued)
+  bucketUsed     CreditBucket  @map("bucket_used")
+  resultKey      String?       @map("result_key")
+  previewKey     String?       @map("preview_key")
+  error          String?
+  reported       Boolean       @default(false)
+  createdAt      DateTime      @default(now()) @map("created_at")
+  finishedAt     DateTime?     @map("finished_at")
+  inputDeletedAt DateTime?     @map("input_deleted_at")
+  user           User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  gown           Gown          @relation(fields: [gownId], references: [id])
+
+  @@index([userId, createdAt])
+  @@index([status])
+  @@map("tryon_jobs")
+}
+
+model Referral {
+  id             String         @id @default(cuid())
+  inviterId      String         @map("inviter_id")
+  inviteeId      String         @unique @map("invitee_id")
+  status         ReferralStatus @default(registered)
+  rewardLedgerId String?        @map("reward_ledger_id")
+  flagReason     String?        @map("flag_reason")
+  createdAt      DateTime       @default(now()) @map("created_at")
+  updatedAt      DateTime       @updatedAt @map("updated_at")
+  inviter        User           @relation("Inviter", fields: [inviterId], references: [id], onDelete: Cascade)
+  invitee        User           @relation("Invitee", fields: [inviteeId], references: [id], onDelete: Cascade)
+
+  @@index([inviterId, status])
+  @@map("referrals")
+}
+
+model Booking {
+  id            String        @id @default(cuid())
+  name          String
+  phone         String
+  eventDate     DateTime?     @map("event_date")
+  preferredDate DateTime?     @map("preferred_date")
+  preferredTime String?       @map("preferred_time")
+  gownId        String?       @map("gown_id")
+  note          String?
+  status        BookingStatus @default(NEW)
+  createdAt     DateTime      @default(now()) @map("created_at")
+  gown          Gown?         @relation(fields: [gownId], references: [id])
+
+  @@index([status, createdAt])
+  @@map("bookings")
+}
+
+model Setting {
+  key       String   @id
+  value     Json
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("settings")
+}
+
+model AuditLog {
+  id        String   @id @default(cuid())
+  actor     String?
+  action    String
+  meta      Json?
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@index([action, createdAt])
+  @@map("audit_logs")
+}

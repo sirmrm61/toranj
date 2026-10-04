@@ -1,0 +1,63 @@
+# Development stack: `docker compose up -d db redis storage` then `npm run dev` + `npm run worker`.
+# Full stack (web + worker in containers): `docker compose --profile app up -d --build`.
+services:
+  db:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_USER: toranj
+      POSTGRES_PASSWORD: toranj
+      POSTGRES_DB: toranj
+    ports: ["5432:5432"]
+    volumes: [pgdata:/var/lib/postgresql/data]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U toranj"]
+      interval: 5s
+      retries: 10
+
+  redis:
+    image: redis:7-alpine
+    ports: ["6379:6379"]
+    volumes: [redisdata:/data]
+
+  # S3-compatible object storage (RustFS; any S3 provider works in production)
+  storage:
+    image: rustfs/rustfs:latest
+    environment:
+      RUSTFS_ACCESS_KEY: toranj
+      RUSTFS_SECRET_KEY: toranj-secret
+      RUSTFS_CONSOLE_ENABLE: "true"
+    ports: ["9000:9000", "9001:9001"]
+    volumes: [storagedata:/data]
+
+  web:
+    profiles: [app]
+    build: .
+    env_file: .env
+    environment:
+      DATABASE_URL: postgresql://toranj:toranj@db:5432/toranj
+      REDIS_URL: redis://redis:6379
+      STORAGE_ENDPOINT: http://storage:9000
+    ports: ["3000:3000"]
+    depends_on:
+      db: { condition: service_healthy }
+      redis: { condition: service_started }
+      storage: { condition: service_started }
+
+  worker:
+    profiles: [app]
+    build: .
+    command: ["npm", "run", "worker:start"]
+    env_file: .env
+    environment:
+      DATABASE_URL: postgresql://toranj:toranj@db:5432/toranj
+      REDIS_URL: redis://redis:6379
+      STORAGE_ENDPOINT: http://storage:9000
+    depends_on:
+      db: { condition: service_healthy }
+      redis: { condition: service_started }
+      storage: { condition: service_started }
+
+volumes:
+  pgdata:
+  redisdata:
+  storagedata:

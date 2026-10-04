@@ -1,0 +1,36 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    env:
+      DATABASE_URL: postgresql://toranj:toranj@localhost:5432/toranj
+      REDIS_URL: redis://localhost:6379
+      SESSION_SECRET: ci-secret-ci-secret-ci-secret-ci
+    services:
+      postgres:
+        image: postgres:17-alpine
+        env:
+          POSTGRES_USER: toranj
+          POSTGRES_PASSWORD: toranj
+          POSTGRES_DB: toranj
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U toranj" --health-interval 5s --health-retries 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npx prisma migrate deploy
+      - run: npm run lint
+      - run: npm run typecheck
+      - run: npm test
+      - run: npm run build
