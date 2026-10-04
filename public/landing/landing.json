@@ -1,0 +1,94 @@
+{
+  "generated": "photos",
+  "imageSize": {
+    "w": 848,
+    "h": 1264
+  },
+  "eyes": [
+    {
+      "u": 0.4837853773584906,
+      "v": 0.20207014767932488
+    },
+    {
+      "u": 0.5267295597484277,
+      "v": 0.20266350210970466
+    }
+  ],
+  "eyeSize": {
+    "rx": 0.013310731132075471,
+    "ry": 0.008334651898734176
+  },
+  "irisRadius": 0.0065074685534591194,
+  "head": {
+    "u": 0.5044221698113207,
+    "v": 0.21011339662447256,
+    "radius": 0.05977790880503145
+  },
+  "eyeTravel": 0.0047169811320754715,
+  "background": "/landing/background.webp",
+  "groom": "/landing/groom.webp",
+  "poster": "/landing/poster.webp",
+  "gowns": [
+    {
+      "key": "morvarid",
+      "slug": "ترنج-مروارید",
+      "name": "مروارید",
+      "tagline": "دامن پفی با تور چندلایه و کرست مرواریددوزی",
+      "transition": "liquid",
+      "image": "/landing/bride-morvarid.webp",
+      "depth": "/landing/depth-morvarid.webp",
+      "poster": "/landing/poster-morvarid.webp"
+    },
+    {
+      "key": "mah",
+      "slug": "ترنج-ماه",
+      "name": "ماه",
+      "tagline": "مدل ماهی با گیپور فرانسوی",
+      "transition": "ripple",
+      "image": "/landing/bride-mah.webp",
+      "depth": "/landing/depth-mah.webp",
+      "poster": "/landing/poster-mah.webp"
+    },
+    {
+      "key": "nasim",
+      "slug": "ترنج-نسیم",
+      "name": "نسیم",
+      "tagline": "ساده و مینیمال با ساتن براق",
+      "transition": "sweep",
+      "image": "/landing/bride-nasim.webp",
+      "depth": "/landing/depth-nasim.webp",
+      "poster": "/landing/poster-nasim.webp"
+    },
+    {
+      "key": "shokoufeh",
+      "slug": "ترنج-شکوفه",
+      "name": "شکوفه",
+      "tagline": "دامن A-line با گل‌های سه‌بعدی",
+      "transition": "curtain",
+      "image": "/landing/bride-shokoufeh.webp",
+      "depth": "/landing/depth-shokoufeh.webp",
+      "poster": "/landing/poster-shokoufeh.webp"
+    },
+    {
+      "key": "setareh",
+      "slug": "ترنج-ستاره",
+      "name": "ستاره",
+      "tagline": "سنگ‌دوزی کامل با دنباله سلطنتی",
+      "transition": "particles",
+      "image": "/landing/bride-setareh.webp",
+      "depth": "/landing/depth-setareh.webp",
+      "poster": "/landing/poster-setareh.webp"
+    },
+    {
+      "key": "yas",
+      "slug": "ترنج-یاس",
+      "name": "یاس",
+      "tagline": "طراحی پیلی‌دار با سرشانه‌های مجسمه‌ای و آستین گیپور",
+      "transition": "radial",
+      "image": "/landing/bride-yas.webp",
+      "depth": "/landing/depth-yas.webp",
+      "poster": "/landing/poster-yas.webp"
+    }
+  ],
+  "eyeOverlay": false
+}
