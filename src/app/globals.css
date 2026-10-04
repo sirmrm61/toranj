@@ -1,26 +1,80 @@
 @import "tailwindcss";
 
+@theme {
+  --font-sans: var(--font-vazirmatn), ui-sans-serif, system-ui, sans-serif;
+  --color-ivory: #faf7f2;
+  --color-cream: #f3ece2;
+  --color-sand: #e6dacb;
+  --color-gold: #b08d57;
+  --color-gold-dark: #8c6c3d;
+  --color-gold-light: #d9c39a;
+  --color-espresso: #2b211c;
+  --color-cocoa: #4a372b;
+  --color-ink: #1c1714;
+  --color-muted: #7a6a5d;
+}
+
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  color-scheme: light;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+html {
+  scroll-behavior: smooth;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--color-ivory);
+  color: var(--color-ink);
+  font-feature-settings: "ss01";
+}
+
+@layer components {
+  .container-x {
+    @apply mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8;
+  }
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 rounded-full px-6 py-3 text-sm font-semibold transition focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gold disabled:cursor-not-allowed disabled:opacity-60;
+  }
+  .btn-primary {
+    @apply inline-flex items-center justify-center gap-2 rounded-full px-6 py-3 text-sm font-semibold transition focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gold disabled:cursor-not-allowed disabled:opacity-60 bg-espresso text-ivory hover:bg-cocoa;
+  }
+  .btn-gold {
+    @apply inline-flex items-center justify-center gap-2 rounded-full px-6 py-3 text-sm font-semibold transition focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gold disabled:cursor-not-allowed disabled:opacity-60 bg-gold text-white hover:bg-gold-dark;
+  }
+  .btn-outline {
+    @apply inline-flex items-center justify-center gap-2 rounded-full px-6 py-3 text-sm font-semibold transition focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gold disabled:cursor-not-allowed disabled:opacity-60 border border-espresso/30 text-espresso hover:border-espresso hover:bg-espresso/5;
+  }
+  .btn-ghost-light {
+    @apply inline-flex items-center justify-center gap-2 rounded-full px-6 py-3 text-sm font-semibold transition focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gold disabled:cursor-not-allowed disabled:opacity-60 border border-white/40 text-white hover:bg-white/10;
+  }
+  .card {
+    @apply rounded-2xl border border-sand bg-white shadow-[0_1px_2px_rgba(43,33,28,.04),0_8px_24px_-12px_rgba(43,33,28,.12)];
+  }
+  .input {
+    @apply w-full rounded-xl border border-sand bg-white px-4 py-3 text-sm text-ink placeholder:text-muted/70 focus:border-gold focus:ring-2 focus:ring-gold/20 focus:outline-none;
+  }
+  .label {
+    @apply mb-1.5 block text-sm font-medium text-espresso;
+  }
+  .section-title {
+    @apply text-2xl font-bold text-espresso sm:text-3xl;
+  }
+  .eyebrow {
+    @apply text-xs font-semibold tracking-[0.2em] text-gold uppercase;
+  }
+  .badge {
+    @apply inline-flex items-center rounded-full bg-cream px-2.5 py-1 text-xs font-medium text-cocoa;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
 }
