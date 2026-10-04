@@ -1,30 +1,30 @@
 {
-  "generated": "placeholder",
+  "generated": "photos",
   "imageSize": {
-    "w": 768,
-    "h": 1152
+    "w": 848,
+    "h": 1264
   },
   "eyes": [
     {
-      "u": 0.4713541666666667,
-      "v": 0.2152777777777778
+      "u": 0.4837853773584906,
+      "v": 0.20207014767932488
     },
     {
-      "u": 0.5286458333333334,
-      "v": 0.2152777777777778
+      "u": 0.5267295597484277,
+      "v": 0.20266350210970466
     }
   ],
   "eyeSize": {
-    "rx": 0.015625,
-    "ry": 0.005642361111111111
+    "rx": 0.013310731132075471,
+    "ry": 0.008334651898734176
   },
-  "irisRadius": 0.0067708333333333336,
+  "irisRadius": 0.0065074685534591194,
   "head": {
-    "u": 0.5,
-    "v": 0.2170138888888889,
-    "radius": 0.1953125
+    "u": 0.5044221698113207,
+    "v": 0.21011339662447256,
+    "radius": 0.05977790880503145
   },
-  "eyeTravel": 0.0054687500000000005,
+  "eyeTravel": 0.0047169811320754715,
   "background": "/landing/background.webp",
   "groom": "/landing/groom.webp",
   "poster": "/landing/poster.webp",
@@ -83,11 +83,12 @@
       "key": "yas",
       "slug": "ترنج-یاس",
       "name": "یاس",
-      "tagline": "لباس نامزدی کوتاه و شیک",
+      "tagline": "طراحی پیلی‌دار با سرشانه‌های مجسمه‌ای و آستین گیپور",
       "transition": "radial",
       "image": "/landing/bride-yas.webp",
       "depth": "/landing/depth-yas.webp",
       "poster": "/landing/poster-yas.webp"
     }
-  ]
+  ],
+  "eyeOverlay": false
 }

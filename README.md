@@ -31,8 +31,8 @@
   seed.ts                     # داده اولیه (لباس‌ها، بسته‌ها، تنظیمات)
 /public/landing               # دارایی‌های لندینگ (بافت، نقشه عمق، پوستر، config)
 /scripts
-  generate-assets.ts          # تولید آفلاین دارایی‌های لندینگ با Gemini Pro (TRD §7.6)
   generate-placeholder-assets.ts # دارایی‌های placeholder بدون نیاز به API
+  landing/import_photos.py    # پردازش آفلاین عکس‌ها و ساخت دارایی‌های لندینگ
 /src
   /app
     (site)/page.tsx           # لندینگ
@@ -71,6 +71,26 @@ npm run worker         # در ترمینال جدا: Worker صف پرو
 
 شماره‌های موجود در `ADMIN_PHONES` پس از ورود نقش مدیر می‌گیرند و به `/admin` دسترسی دارند.
 
+## وارد کردن عکس‌های لندینگ
+
+برای بازتولید دارایی‌ها، یک محیط مجازی خارج از مخزن بسازید و وابستگی‌ها را نصب کنید:
+
+```bash
+python3 -m venv ~/venvs/landing
+source ~/venvs/landing/bin/activate
+python -m pip install --upgrade pip
+python -m pip install torch --index-url https://download.pytorch.org/whl/cpu
+python -m pip install -r scripts/landing/requirements.txt
+```
+
+یک نسخه از `scripts/landing/sources.example.json` بیرون از مخزن کپی کنید و مسیر فایل‌های منبع را در آن تنظیم کنید. سپس اجرا کنید:
+
+```bash
+python scripts/landing/import_photos.py --sources ~/landing-src/sources.json
+```
+
+فایل نگاشت، عکس‌های منبع و مدل‌های دانلودشده را در مخزن قرار ندهید.
+
 ## مسیرهای اصلی
 
 | مسیر | توضیح |
@@ -98,7 +118,7 @@ npm run worker         # در ترمینال جدا: Worker صف پرو
 | `npm run lint` / `npm run typecheck` / `npm test` | کیفیت کد |
 | `npm run build` | build تولید |
 | `npm run assets:placeholder` | ساخت دارایی‌های placeholder لندینگ |
-| `npm run assets:generate` | تولید دارایی‌های واقعی لندینگ با Gemini Pro (نیازمند `GEMINI_API_KEY`) |
+| `npm run assets:import -- --sources <mapping.json>` | واردکردن عکس‌ها و ساخت دارایی‌های لندینگ با Python |
 
 ## استقرار
 

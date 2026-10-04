@@ -77,7 +77,7 @@ function Stage({ index, pointer, onReady }: SceneProps) {
       uEyeTravel: { value: landing.eyeTravel * W },
       uHead: { value: new THREE.Vector3(landing.head.u * W, landing.head.v * H, landing.head.radius * W) },
       uParallax: { value: 0.014 },
-      uEyesOn: { value: 1 },
+      uEyesOn: { value: landing.eyeOverlay === false ? 0 : 1 },
     }),
     // eslint-disable-next-line react-hooks/exhaustive-deps -- uniforms are created once and mutated per frame
     [brides, depths],

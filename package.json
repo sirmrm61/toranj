@@ -16,7 +16,7 @@
     "db:deploy": "prisma migrate deploy",
     "db:seed": "prisma db seed",
     "assets:placeholder": "tsx scripts/generate-placeholder-assets.ts",
-    "assets:generate": "tsx scripts/generate-assets.ts",
+    "assets:import": "python3 scripts/landing/import_photos.py",
     "postinstall": "prisma generate"
   },
   "dependencies": {

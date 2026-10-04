@@ -20,6 +20,7 @@ export type LandingConfig = {
   irisRadius: number;
   eyeTravel: number;
   head: { u: number; v: number; radius: number };
+  eyeOverlay?: boolean;
   background: string;
   groom: string;
   poster: string;
